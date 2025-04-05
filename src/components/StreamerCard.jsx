@@ -15,7 +15,7 @@ export default function StreamerCard() {
                 <p className="text-gray-300 mb-6">
                     Victor Game Shop was founded by a gamer and streamer who was tired of overpriced keys and shady stores. Join our community for giveaways, gaming tips, and live discussions!
                 </p>
-                <Button href="https://twitch.tv/victorsgameventure" variant="twitch">
+                <Button href="https://twitch.tv/victorgamestudio" variant="twitch">
                     Follow on Twitch 📺
                 </Button>
             </div>

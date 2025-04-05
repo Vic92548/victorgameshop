@@ -94,8 +94,8 @@ export default function Footer() {
 
                 {/* Bottom Footer */}
                 <div className="border-t border-[#222] mt-10 pt-6 text-center text-gray-500">
-                    <p>© 2025 Victor Game Shop. Created with ❤️ by Victor's Game Venture.</p>
-                    <p className="mt-2 text-xs">This is an open source project. <a href="#" className="text-[#ffe632] hover:underline">View license</a>.</p>
+                    <p>© 2025 Victor Game Shop. Created with ❤️ by <a target={"_blank"} className="text-[#ffe632] hover:underline" href={"https://twitch.tv/victorgamestudio"}>Victor Game Studio</a></p>
+                    <p className="mt-2 text-xs">This is an open source project. <a href="https://github.com/Victor-Game-Studio/victorgameshop/blob/main/LICENSE" target={"_blank"} className="text-[#ffe632] hover:underline">View license</a>.</p>
                 </div>
             </div>
         </footer>

@@ -123,7 +123,7 @@ export default function Dashboard() {
                             <div className="bg-gradient-to-r from-[#9146ff]/20 to-[#9146ff]/5 rounded-lg p-4 border border-[#9146ff]/30">
                                 <h3 className="font-bold text-lg mb-2">Twitch Subscriber Exclusive</h3>
                                 <p className="text-gray-300 mb-3">Upgrade to a Twitch subscription to receive a free AAA game key every month!</p>
-                                <a href="https://twitch.tv/" target="_blank" rel="noopener noreferrer" className="inline-block bg-[#9146ff] text-white px-4 py-2 rounded hover:bg-opacity-90 transition duration-200">
+                                <a href="https://twitch.tv/victorgamestudio" target="_blank" rel="noopener noreferrer" className="inline-block bg-[#9146ff] text-white px-4 py-2 rounded hover:bg-opacity-90 transition duration-200">
                                     Subscribe on Twitch
                                 </a>
                             </div>
@@ -157,7 +157,7 @@ export default function Dashboard() {
                             <h2 className="text-xl font-bold mb-1">Unlock More Benefits</h2>
                             <p className="text-gray-400">Follow Victor's streams and participate in chat to earn points!</p>
                         </div>
-                        <a href="https://twitch.tv/" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-[#9146ff] text-white rounded-lg hover:bg-opacity-90 transition duration-200 flex items-center">
+                        <a href="https://twitch.tv/victorgamestudio" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-[#9146ff] text-white rounded-lg hover:bg-opacity-90 transition duration-200 flex items-center">
                             <svg className="w-5 h-5 fill-current mr-2" viewBox="0 0 24 24">
                                 <path d="M4.3 3H21.7V17.9L16.7 23H12.2L9.4 23H4.3V3.9L4.3 3ZM19.7 15.8V5H6.3V19H9.3V23L12.9 19H16.7L19.7 15.8Z" />
                                 <path d="M12.8 13.3H10.8V8.7H12.8V13.3ZM17.8 13.3H15.8V8.7H17.8V13.3Z" />
