@@ -14,11 +14,12 @@ import Footer from "@/components/Footer";
 // Server-side data fetching function
 async function getFeaturedGames() {
     try {
-        // For production, use absolute URLs or relative URLs that work in SSR context
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/games?limit=4&featured=true`, {
-            // Adding cache options
-            next: { revalidate: 30 } // Revalidate every hour
-        });
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/games?limit=4&featured=true`,
+            {
+                next: { revalidate: 30 } // Revalidate every 30 seconds
+            }
+        );
 
         if (!response.ok) throw new Error('Failed to fetch games');
 
@@ -28,10 +29,18 @@ async function getFeaturedGames() {
         console.error('Error fetching games:', error);
         // Return fallback data
         return [
-            { id: 1, title: "Cyber Explorer 2077", price: "$39.99", discount: "60% OFF", image: "/game1.jpg" },
-            { id: 2, title: "Fantasy Quest XI", price: "$49.99", discount: "40% OFF", image: "/game2.jpg" },
-            { id: 3, title: "Racing Masters 5", price: "$29.99", discount: "25% OFF", image: "/game3.jpg" },
-            { id: 4, title: "Battle Legends", price: "$59.99", discount: "15% OFF", image: "/game4.jpg" }
+            // Your fallback data with keysInfo structure
+            {
+                id: 1,
+                title: "Cyber Explorer 2077",
+                image: "/game1.jpg",
+                keysInfo: {
+                    availableCount: 5,
+                    minPrice: 39.99,
+                    maxPrice: 49.99,
+                    platforms: ["PC", "Xbox"]
+                }
+            }
         ];
     }
 }
@@ -44,9 +53,11 @@ export default async function Home() {
         id: game.id,
         title: game.title,
         price: game.keysInfo?.minPrice ? `$${game.keysInfo.minPrice.toFixed(2)}` : "$49.99",
-        discount: game.keysInfo?.minPrice !== game.keysInfo?.maxPrice ? "ON SALE" : "",
+        discount:  game.keysInfo?.discount + "% OFF",
         image: game.image || "/placeholder-game.jpg"
     }));
+
+    console.log(featuredGames);
 
     return (
         <div className="min-h-screen flex flex-col bg-[#0a0a0a]">

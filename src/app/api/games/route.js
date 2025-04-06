@@ -163,101 +163,99 @@ export async function GET(request) {
             queries
         );
 
-        // If we need to include available keys info
-        const includeKeysInfo = url.searchParams.get('includeKeysInfo') === 'true';
-        let gamesWithKeys = response.documents;
+        // Always include keys info, but only the necessary data
+        // For each game, get the available keys (not sold)
+        const gameIds = response.documents.map(game => game.$id);
 
-        if (includeKeysInfo) {
-            // For each game, get the available keys (not sold)
-            const gameIds = response.documents.map(game => game.$id);
+        // Fetch all available keys for these games
+        const keysResponse = await databases.listDocuments(
+            DATABASE_ID,
+            KEYS_COLLECTION_ID,
+            [
+                Query.equal('isSold', false),
+                Query.equal('gameId', gameIds),
+            ]
+        );
 
-            // Fetch all available keys for these games
-            const keysResponse = await databases.listDocuments(
-                DATABASE_ID,
-                KEYS_COLLECTION_ID,
-                [
-                    Query.equal('isSold', false),
-                    Query.equal('gameId', gameIds),
-                ]
-            );
-
-            // Group keys by gameId
-            const keysByGameId = {};
-            keysResponse.documents.forEach(key => {
-                if (!keysByGameId[key.gameId]) {
-                    keysByGameId[key.gameId] = [];
-                }
-                keysByGameId[key.gameId].push(key);
-            });
-
-            // Add keys info to each game
-            gamesWithKeys = response.documents.map(game => {
-                const availableKeys = keysByGameId[game.$id] || [];
-
-                // Get min, max, and avg prices
-                let minPrice = null;
-                let maxPrice = null;
-                let avgPrice = 0;
-
-                if (availableKeys.length > 0) {
-                    const prices = availableKeys.map(key => {
-                        // Apply discount if available
-                        return key.price * (1 - (key.discountPercentage || 0) / 100);
-                    });
-
-                    minPrice = Math.min(...prices);
-                    maxPrice = Math.max(...prices);
-                    avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
-                }
-
-                // Get available platforms
-                const platforms = [...new Set(availableKeys.map(key => key.platform))];
-
-                return {
-                    id: game.$id,
-                    ...game,
-                    keysInfo: {
-                        availableCount: availableKeys.length,
-                        minPrice,
-                        maxPrice,
-                        avgPrice,
-                        platforms
-                    }
-                };
-            });
-        }
-
-        // Format response
-        const formattedGames = gamesWithKeys.map(game => ({
-            id: game.$id,
-            title: game.title,
-            description: game.description,
-            image: game.image,
-            genre: game.genre,
-            featured: game.featured,
-            popularity: game.popularity,
-            releaseDate: game.releaseDate,
-            reviewText: game.reviewText,
-            reviewScore: game.reviewScore,
-            youtubeReviewLink: game.youtubeReviewLink,
-            ...(game.keysInfo && { keysInfo: game.keysInfo }),
-        }));
-
-        return NextResponse.json({
-            games: formattedGames,
-            pagination: {
-                total: response.total,
-                limit,
-                offset,
-                hasMore: offset + limit < response.total
+        // Group keys by gameId
+        const keysByGameId = {};
+        keysResponse.documents.forEach(key => {
+            if (!keysByGameId[key.gameId]) {
+                keysByGameId[key.gameId] = [];
             }
+            // Only add the key data we need for pricing, not the actual key
+            keysByGameId[key.gameId].push({
+                price: key.price,
+                discountPercentage: key.discountPercentage || 0,
+                platform: key.platform
+            });
+        });
+
+        // Add keys info to each game
+        const gamesWithKeys = response.documents.map(game => {
+            const availableKeys = keysByGameId[game.$id] || [];
+
+            // Get min, max, and avg prices
+            let minPrice = null;
+            let maxPrice = null;
+            let avgPrice = 0;
+            let discount = 0;
+
+            if (availableKeys.length > 0) {
+                const prices = availableKeys.map(key => {
+                    // Apply discount if available
+                    return key.price * (1 - (key.discountPercentage) / 100);
+                });
+
+                const discounts = availableKeys.map(key => {
+                    // Apply discount if available
+                    return key.discountPercentage;
+                });
+
+                minPrice = Math.min(...prices);
+                maxPrice = Math.max(...prices);
+                discount = Math.max(...discounts);
+                avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+            }
+
+            // Get available platforms
+            const platforms = [...new Set(availableKeys.map(key => key.platform))];
+
+            // Format the game object with safe keys info
+            return {
+                id: game.$id,
+                title: game.title,
+                description: game.description,
+                image: game.image,
+                genre: game.genre,
+                featured: game.featured,
+                popularity: game.popularity,
+                releaseDate: game.releaseDate,
+                reviewText: game.reviewText,
+                reviewScore: game.reviewScore,
+                youtubeReviewLink: game.youtubeReviewLink,
+                keysInfo: {
+                    availableCount: availableKeys.length,
+                    discount:discount,
+                    minPrice,
+                    maxPrice,
+                    avgPrice,
+                    platforms
+                }
+            };
+        });
+
+        // Return the games with safe keys info
+        return new Response(JSON.stringify({ games: gamesWithKeys }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 200,
         });
 
     } catch (error) {
         console.error('Error fetching games:', error);
-        return NextResponse.json(
-            { error: 'Failed to fetch games', details: error.message },
-            { status: 500 }
+        return new Response(
+            JSON.stringify({ error: 'Failed to fetch games', details: error.message }),
+            { headers: { 'Content-Type': 'application/json' }, status: 500 }
         );
     }
 }
