@@ -1,9 +1,18 @@
 // components/GameCard.jsx
-"use client"
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 
 export default function GameCard({ game }) {
+    const { addToCart, openCart } = useCart();
+
+    const handleAddToCart = (e) => {
+        e.preventDefault(); // Prevent link navigation
+        addToCart(game);
+        openCart(); // Optionally open the cart when an item is added
+    };
+
     return (
         <Link href={`/game/${game.id}`}>
             <div className="bg-[#121212] rounded-lg overflow-hidden hover:shadow-[0_0_15px_rgba(255,230,50,0.3)] transition-shadow group cursor-pointer">
@@ -25,10 +34,7 @@ export default function GameCard({ game }) {
                         <span className="text-[#ffe632] font-bold">{game.price}</span>
                         <button
                             className="bg-[#333] hover:bg-[#444] text-white text-sm px-3 py-1 rounded transition-colors"
-                            onClick={(e) => {
-                                e.preventDefault(); // Prevent link navigation
-                                // Add your cart logic here
-                            }}
+                            onClick={handleAddToCart}
                         >
                             Add to cart 🛒
                         </button>

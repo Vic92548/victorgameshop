@@ -1,13 +1,16 @@
+// app/login/page.jsx (excerpt)
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { account } from "@/utils/appwrite/config"; // Correct import path
+import { useRouter, useSearchParams } from "next/navigation";
+import { account } from "@/utils/appwrite/config";
 
 export default function TwitchLoginPage() {
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState(null);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirect = searchParams.get('redirect') || '/dashboard';
 
     useEffect(() => {
         // Check if user is already logged in
@@ -15,7 +18,7 @@ export default function TwitchLoginPage() {
             try {
                 const session = await account.get();
                 setUser(session);
-                router.push('/dashboard'); // Redirect to dashboard if already logged in
+                router.push(redirect); // Redirect to the intended destination
             } catch (error) {
                 // User not logged in, which is expected
                 setUser(null);
@@ -23,16 +26,19 @@ export default function TwitchLoginPage() {
         };
 
         checkSession();
-    }, [router]);
+    }, [router, redirect]);
 
     const loginWithTwitch = async () => {
         try {
             setLoading(true);
-            // Start OAuth session with Twitch using environment variables
+            // Include the redirect URL in the OAuth session creation
+            const redirectUrl = `${window.location.origin}${redirect}`;
+
             account.createOAuth2Session(
                 'twitch',
-                process.env.NEXT_PUBLIC_SUCCESS_URL,
-                process.env.NEXT_PUBLIC_FAILURE_URL
+                redirectUrl,
+                `${window.location.origin}/login?error=auth_failed`,
+                ["user:read:follows","channel:read:subscriptions", "user:read:email"]
             );
         } catch (error) {
             console.error("Twitch login error:", error);
