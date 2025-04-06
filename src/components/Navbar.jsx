@@ -6,7 +6,7 @@ export default function Navbar() {
         <nav className="bg-black border-b border-[#222] sticky top-0 z-50">
             <div className="container mx-auto flex justify-between items-center py-4 px-6">
                 <div className="flex items-center gap-2">
-                    <span className="text-[#ffe632] font-extrabold text-2xl tracking-tight">VICTOR<span className="text-white"> GAME SHOP</span></span>
+                    <a href={"/"} className="text-[#ffe632] font-extrabold text-2xl tracking-tight">VICTOR<span className="text-white"> GAME SHOP</span></a>
                 </div>
                 <div className="hidden md:flex items-center gap-8">
                     <a href="#" className="text-white hover:text-[#ffe632] transition-colors text-sm uppercase font-medium">Home</a>
